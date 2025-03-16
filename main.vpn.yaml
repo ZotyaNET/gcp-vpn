@@ -1,0 +1,49 @@
+imports:
+  - path: vm.jinja
+resources:
+  - name: deploy-business-vm-with-business-server
+    type: vm.jinja
+    properties:
+      ############  EDIT PROPERTY START HERE ##############
+      region: us-central1
+      zone: us-central1-a
+      vmtype: e2-standard-2
+      linuxType: ubuntu-2204-lts # debian-11-bullseye-v20250311
+      diskSizeGb: 64
+      startup-script: |
+        #!/bin/bash
+        ### mandatory settings ###
+        BUSINESS_HOST=host.teaor.info
+        CUSTOM_SSH_KEY=
+        ### default settings(basically no need to change) ###
+        BUSINESS_DOCKER_REPO=https://github.com/ZotyaNET/teaorinfo-docker
+        BUSINESS_DOCKER_REPO_BRANCH=master
+        BUSINESS_REVERSEPROXY=nginx
+        ACME_CA_URI:=https://acme-staging.api.letsencrypt.org/directory
+        ############  EDIT PROPERTY END HERE ##############
+        ### Script below
+        if ! [ -x "$(command -v git)" ]; then
+            apt-get update 2>error
+            apt-get install -y git 2>error
+        fi
+        # Setup SSH access via private key
+        ssh-keygen -t rsa -f /root/.ssh/id_rsa_business -q -P ""
+        echo "# Key used by teaor.info server" >> /root/.ssh/authorized_keys
+        cat /root/.ssh/id_rsa_business.pub >> /root/.ssh/authorized_keys
+        if [[ "$CUSTOM_SSH_KEY" ]]; then
+            echo "" >> /root/.ssh/authorized_keys
+            echo "# User key" >> /root/.ssh/authorized_keys
+            echo "$CUSTOM_SSH_KEY" >> /root/.ssh/authorized_keys
+            echo "Custom SSH Key added to /root/.ssh/authorized_keys"
+        fi
+        sed -i -e '/^PasswordAuthentication / s/ .*/ no/' /etc/ssh/sshd_config
+        userdel -r -f temp
+        # Configure teaor.info to have access to SSH
+        BUSINESS_HOST_SSHKEYFILE=/root/.ssh/id_rsa_business
+        # Clone business repo
+        git clone $BUSINESS_DOCKER_REPO
+        cd teaorinfo-docker
+        git checkout $BUSINESS_DOCKER_REPO_BRANCH
+        [ -x "$(command -v /etc/init.d/sshd)" ] && nohup /etc/init.d/sshd restart &
+        [ -x "$(command -v /etc/init.d/ssh)" ] && nohup /etc/init.d/ssh restart &
+        gcloud config set project $(gcloud projects list --format="value(projectId)" --filter="name~'local-disk-'" --limit=1)
