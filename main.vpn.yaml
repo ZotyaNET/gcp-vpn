@@ -16,7 +16,7 @@ resources:
         BUSINESS_HOST=host.teaor.info
         CUSTOM_SSH_KEY=
         ### default settings(basically no need to change) ###
-        BUSINESS_DOCKER_REPO=https://github.com/ZotyaNET/teaorinfo-docker
+        BUSINESS_DOCKER_REPO=https://github.com/ZotyaNET/docker-alpine-python
         BUSINESS_DOCKER_REPO_BRANCH=master
         BUSINESS_REVERSEPROXY=nginx
         ACME_CA_URI:=https://acme-staging.api.letsencrypt.org/directory
@@ -42,7 +42,7 @@ resources:
         BUSINESS_HOST_SSHKEYFILE=/root/.ssh/id_rsa_business
         # Clone business repo
         git clone $BUSINESS_DOCKER_REPO
-        cd teaorinfo-docker
+        cd docker-alpine-python
         git checkout $BUSINESS_DOCKER_REPO_BRANCH
         [ -x "$(command -v /etc/init.d/sshd)" ] && nohup /etc/init.d/sshd restart &
         [ -x "$(command -v /etc/init.d/ssh)" ] && nohup /etc/init.d/ssh restart &
