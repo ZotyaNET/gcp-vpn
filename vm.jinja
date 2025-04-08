@@ -3,12 +3,11 @@ resources:
   name: {{ env["deployment"] }}-address
   properties:
     region: {{ properties["region"] }}
-- key: debug-zone
-  value: {{ properties["zone"] }}
 - type: compute.v1.instance
-  name: {{ env["deployment"] }}-vm
+  name: {{ env["deployment"] }}
   properties:
     zone: {{ properties["zone"] }}
+    name: {{ properties["zone"] }}
     machineType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/machineTypes/{{properties["vmtype"]}}
     metadata:
       items:
