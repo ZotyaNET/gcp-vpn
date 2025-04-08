@@ -5,8 +5,8 @@ resources:
     type: vm.jinja
     properties:
       ############  EDIT PROPERTY START HERE ##############
-      region: us-central1
-      zone: us-central1-a
+      region: europe-central2
+      zone: europe-central2-a
       vmtype: e2-standard-2
       linuxType: ubuntu-2204-lts # debian-11-bullseye-v20250311
       diskSizeGb: 64
