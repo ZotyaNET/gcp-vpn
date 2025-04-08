@@ -3,7 +3,8 @@ resources:
   name: {{ env["deployment"] }}-address
   properties:
     region: {{ properties["region"] }}
-
+- key: debug-zone
+  value: {{ properties["zone"] }}
 - type: compute.v1.instance
   name: {{ env["deployment"] }}-vm
   properties:
